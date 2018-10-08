@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Firebase Authentication Tutorial</string>
+    <string name="bistro_logo">bistro_logo</string>
+    <string name="bistro_name">bistro_name</string>
+    <string name="username">Username</string>
+    <string name="login">Login</string>
+    <string name="signup">Get Started</string>
+    <string name="email">Email</string>
+    <string name="phone_no">Phone No</string>
+    <string name="password">Password</string>
+    <string name="confirm_password">Confirm Password</string>
+</resources>
