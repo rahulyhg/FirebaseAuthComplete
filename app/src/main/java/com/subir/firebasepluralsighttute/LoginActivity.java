@@ -1,8 +1,12 @@
 package com.subir.firebasepluralsighttute;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,7 +30,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     Button loginBtn;
     TextView registerTxt;
     EditText username,password;
-
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
 
@@ -47,8 +50,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         mAuth = FirebaseAuth.getInstance();
     }
-
-
 
     @Override
     protected void onStart() {

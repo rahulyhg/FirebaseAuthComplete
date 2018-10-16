@@ -1,5 +1,8 @@
 package com.subir.firebasepluralsighttute;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -11,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +33,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -69,10 +76,35 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.changeEmail:
-                changeEmail();
+                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+                LayoutInflater inflater = this.getLayoutInflater();
+                final View dialogView = inflater.inflate(R.layout.custom_dialog_email_change, null);
+                dialogBuilder.setView(dialogView);
+
+                final EditText email = dialogView.findViewById(R.id.new_email);
+
+                dialogBuilder.setTitle("Change Email");
+                dialogBuilder.setMessage("");
+                dialogBuilder.setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        changeEmail(email.getText().toString());
+                    }
+                });
+                dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog b = dialogBuilder.create();
+                b.show();
+
                 return true;
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
+                startActivity(new Intent(ProfileActivity.this,LoginActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -167,8 +199,27 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    public void changeEmail()
+
+    public void changeEmail(String newEmail)
     {
 
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        user.updateEmail(newEmail)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(),"Email Successfully Changed",Toast.LENGTH_SHORT).show();
+                            FirebaseAuth.getInstance().signOut();
+                            startActivity(new Intent(ProfileActivity.this,LoginActivity.class));
+                            Log.d("success", "User email address updated.");
+                        }
+                        else
+                        {
+                            Toast.makeText(getApplicationContext(),"Email Could Not be Updated",Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }
