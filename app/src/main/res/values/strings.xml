@@ -9,4 +9,44 @@
     <string name="phone_no">Phone No</string>
     <string name="password">Password</string>
     <string name="confirm_password">Confirm Password</string>
+
+
+    <!-- Firebase Database Nodes -->
+    <string name="dbnode_users">users</string>
+    <string name="dbnode_chatrooms">chatrooms</string>
+    <string name="dbnode_departments">departments</string>
+    <string name="dbnode_server">server</string>
+
+
+    <!-- Firebase Database Fields & Cloud Firestore Fields -->
+    <string name="field_chatroom_name">chatroom_name</string>
+    <string name="field_creator_id">creator_id</string>
+    <string name="field_security_level">security_level</string>
+    <string name="field_email">email</string>
+    <string name="field_name">name</string>
+    <string name="field_phone">phone</string>
+    <string name="field_profile_image">profile_image</string>
+    <string name="field_user_id">user_id</string>
+    <string name="field_chatroom_id">chatroom_id</string>
+    <string name="field_chatroom_messages">chatroom_messages</string>
+    <string name="field_message">message</string>
+    <string name="field_timestamp">timestamp</string>
+    <string name="field_messaging_token">messaging_token</string>
+    <string name="field_department">department</string>
+    <string name="field_server_key">server_key</string>
+    <string name="field_users">users</string>
+    <string name="field_last_message_seen">last_message_seen</string>
+    <string name="field_avatar">avatar</string>
+    <string name="field_description">description</string>
+    <string name="field_time_created">time_created</string>
+    <string name="field_assignee">assignee</string>
+    <string name="field_issue_type">issue_type</string>
+    <string name="field_priority">priority</string>
+    <string name="field_reporter">reporter</string>
+    <string name="field_status">status</string>
+    <string name="field_summary">summary</string>
+    <string name="field_time_reported">time_reported</string>
+    <string name="field_url">url</string>
+    <string name="field_comment">comment</string>
+
 </resources>

@@ -2,6 +2,7 @@ package com.subir.firebasepluralsighttute;
 
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,12 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.subir.firebasepluralsighttute.model.User;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -111,13 +116,44 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                                 Snackbar.make(findViewById(R.id.constraintLayout),
                                         "SignUp Successful",Snackbar.LENGTH_SHORT).show();
                                 sendVerificationEmail();
-                                FirebaseAuth.getInstance().signOut();
+
+                                User user = new User();
+                                user.setName("");
+                                user.setPhone("");
+                                user.setProfile_image("https://firebasestorage.googleapis.com/v0/b/fir-pluralsighttutorial.appspot.com/o/AtLLheUKrTaD6SgTY4daPehFemE3%2FIMG_20171230_150051.jpg?alt=media&token=9f4136df-babf-4f5a-8c03-f640d4db2b30");
+                                user.setSecurity_level("1");
+                                user.setUser_id(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                                FirebaseDatabase.getInstance().getReference()
+                                        .child(getString(R.string.dbnode_users))
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful())
+                                        {
+                                            Toast.makeText(getApplicationContext(),"Data Successfully Saved",Toast.LENGTH_SHORT)
+                                                    .show();
+                                            FirebaseAuth.getInstance().signOut();
+                                        }
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Toast.makeText(getApplicationContext(),"Something went Wrong",Toast.LENGTH_SHORT)
+                                                .show();
+                                        FirebaseAuth.getInstance().signOut();
+                                        startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
+
+                                    }
+                                });
                             }
                             else
                             {
                                 Log.d("failed", "createUserWithEmail:failure", task.getException());
                                 Snackbar.make(findViewById(R.id.constraintLayout),
                                         "SignUp Failed",Snackbar.LENGTH_SHORT).show();
+                                startActivity(new Intent(SignUpActivity.this,LoginActivity.class));
                             }
                         }
                     });

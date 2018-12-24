@@ -39,10 +39,17 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.subir.firebasepluralsighttute.model.User;
 
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
-    EditText uid,email,name,pass;
+    EditText phone,email,name,pass;
     ImageView profPic;
     Button applyChange;
     ProgressBar progressBar;
@@ -52,7 +59,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        uid  = findViewById(R.id.uid);
+        phone  = findViewById(R.id.phno);
         email = findViewById(R.id.email);
         name = findViewById(R.id.name);
         pass = findViewById(R.id.password);
@@ -135,26 +142,74 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         if(user!=null)
         {
-            uid.setText(user.getUid());
             email.setText(user.getEmail());
             name.setText(user.getDisplayName());
             pass.setText("**********");
-            Glide.with(ProfileActivity.this)
-                    .load(user.getPhotoUrl())
-                    .listener(new RequestListener<Drawable>() {
-                        @Override
-                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
 
-                        @Override
-                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                            progressBar.setVisibility(View.GONE);
-                            return false;
-                        }
-                    })
-                    .into(profPic);
+            Query query;
+
+            query = FirebaseDatabase.getInstance().getReference()
+                    .child(getString(R.string.dbnode_users));
+            query.orderByKey();
+            query.equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user1;
+                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren())
+                    {
+                        user1 = dataSnapshot1.getValue(User.class);
+                        Glide.with(ProfileActivity.this)
+                                .load(user1.getProfile_image())
+                                .listener(new RequestListener<Drawable>() {
+                                    @Override
+                                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                        progressBar.setVisibility(View.GONE);
+                                        return false;
+                                    }
+
+                                    @Override
+                                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                        progressBar.setVisibility(View.GONE);
+                                        return false;
+                                    }
+                                })
+                                .into(profPic);
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
+
+            query = FirebaseDatabase.getInstance().getReference()
+                    .child(getString(R.string.dbnode_users));
+            query.orderByKey();
+            query.equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    User user1;
+                    for(DataSnapshot dataSnapshot1 : dataSnapshot.getChildren())
+                    {
+                        user1 = dataSnapshot1.getValue(User.class);
+                        phone.setText(user1.getPhone());
+                    }
+
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
             email.setEnabled(false);
             email.selectAll();
@@ -177,7 +232,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         {
             UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
                     .setDisplayName(name.getText().toString())
-                    .setPhotoUri(Uri.parse("https://images.pexels.com/photos/257540/pexels-photo-257540.jpeg"))
+                    .setPhotoUri(Uri.parse("https://firebasestorage.googleapis.com/v0/b/fir-pluralsighttutorial.appspot.com/o/AtLLheUKrTaD6SgTY4daPehFemE3%2FIMG_20171230_150051.jpg?alt=media&token=9f4136df-babf-4f5a-8c03-f640d4db2b30"))
                     .build();
 
             user.updateProfile(userProfileChangeRequest)
@@ -187,6 +242,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                             if(task.isSuccessful())
                             {
+                                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                                databaseReference.child(getString(R.string.dbnode_users))
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .child(getString(R.string.field_name))
+                                        .setValue(name.getText().toString());
+
+                                databaseReference.child(getString(R.string.dbnode_users))
+                                        .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                        .child(getString(R.string.field_phone))
+                                        .setValue(phone.getText().toString());
                                 Toast.makeText(getApplicationContext(),"Changes Applied Successfully",Toast.LENGTH_SHORT).show();
                             }
                             else
@@ -195,6 +260,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             }
                         }
                     });
+
+
         }
 
     }
